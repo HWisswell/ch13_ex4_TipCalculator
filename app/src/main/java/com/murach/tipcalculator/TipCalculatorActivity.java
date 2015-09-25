@@ -1,9 +1,11 @@
 package com.murach.tipcalculator;
 
 import java.text.NumberFormat;
+import java.util.List;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,6 +21,11 @@ import android.content.SharedPreferences.Editor;
 public class TipCalculatorActivity extends Activity 
 implements OnEditorActionListener, OnClickListener {
 
+    private static final String TAG = "TipCalculatorActivity";
+    EditText inputEditText;
+    MyDBHandler dbHandler;
+    Tip tipDate;
+
     // define variables for the widgets
     private EditText billAmountEditText;
     private TextView percentTextView;   
@@ -26,7 +33,10 @@ implements OnEditorActionListener, OnClickListener {
     private Button   percentDownButton;
     private TextView tipTextView;
     private TextView totalTextView;
-    
+    private Button   saveButton;
+
+    int num = 1;
+
     // define instance variables that should be saved
     private String billAmountString = "";
     private float tipPercent = .15f;
@@ -46,11 +56,13 @@ implements OnEditorActionListener, OnClickListener {
         percentDownButton = (Button) findViewById(R.id.percentDownButton);
         tipTextView = (TextView) findViewById(R.id.tipTextView);
         totalTextView = (TextView) findViewById(R.id.totalTextView);
+        saveButton = (Button) findViewById(R.id.saveButton);
 
         // set the listeners
         billAmountEditText.setOnEditorActionListener(this);
         percentUpButton.setOnClickListener(this);
         percentDownButton.setOnClickListener(this);
+        saveButton.setOnClickListener(this);
         
         // get default SharedPreferences object
         prefs = PreferenceManager.getDefaultSharedPreferences(this);        
@@ -58,11 +70,11 @@ implements OnEditorActionListener, OnClickListener {
     
     @Override
     public void onPause() {
-        // save the instance variables       
-        Editor editor = prefs.edit();        
-        editor.putString("billAmountString", billAmountString);
-        editor.putFloat("tipPercent", tipPercent);
-        editor.commit();        
+      //save the instance variables
+      Editor editor = prefs.edit();
+       editor.putString("billAmountString", billAmountString);
+      editor.putFloat("tipPercent", tipPercent);
+        editor.commit();
 
         super.onPause();      
     }
@@ -80,8 +92,25 @@ implements OnEditorActionListener, OnClickListener {
         
         // calculate and display
         calculateAndDisplay();
+
+        //display date and time of last saved tip
+       /* List<Tip> dbString = dbHandler.lastTip(num);
+        String log = "";
+
+        for(Tip pn : dbString){
+            log += tipDate.getDateStringFormatted();
+        }
+
+        Log.i(TAG, log);*/
+
+
+        //call get tips and print database
+        dbHandler = new MyDBHandler(this, null, null, 1);
+        dbHandler.getTips(1);
+        printDatabase();
+
     }
-    
+
     public void calculateAndDisplay() {        
 
         // get the bill amount
@@ -127,6 +156,41 @@ implements OnEditorActionListener, OnClickListener {
             tipPercent = tipPercent + .01f;
             calculateAndDisplay();
             break;
+        case R.id.saveButton:
+            saveClick();
+            break;
         }
+    }
+
+    public void saveClick(){
+        Tip tips = new Tip();
+        billAmountString = billAmountEditText.getText().toString();
+        float billAmount;
+        if (billAmountString.equals("")) {
+            billAmount = 0;
+        }
+        else {
+            billAmount = Float.parseFloat(billAmountString);
+        }
+
+        tips.setBillAmount(billAmount);
+        tips.setTipPercent(tipPercent);
+
+        dbHandler.saveCalculation(billAmount, tipPercent);
+        billAmountEditText.setText("");
+        printDatabase();
+    }
+    public void printDatabase() {
+        List<Tip> dbString = dbHandler.getTips(1);
+        String log = "";
+
+        for(Tip pn : dbString){
+            log += "ID: " + pn.getId() + " Date: " + pn.getDateMillis() + " Amount: "
+                    + pn.getBillAmount() + " Tip %: " + pn.getTipPercent() + "\n";
+        }
+
+        Log.i(TAG, log);
+
+
     }
 }

@@ -75,5 +75,7 @@ public class Tip {
 
 	public void setTipPercent(float tipPercent) {
 		this.tipPercent = tipPercent;
-	}    
+	}
+
+
 }

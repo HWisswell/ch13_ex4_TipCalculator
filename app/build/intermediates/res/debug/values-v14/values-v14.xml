@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/C:/Users/leticia.rabor/AndroidstudioProjects/ch13_ex4_TipCalculator/app/src/main/res/values-v14/styles.xml -->
+    <!-- From: file:/C:/Users/Rie%20Rie/AndroidStudioProjects/ch13_ex4_TipCalculator/app/src/main/res/values-v14/strings.xml -->
+    <eat-comment/>
+    <string name="save_button">Save</string>
+    <!-- From: file:/C:/Users/Rie%20Rie/AndroidStudioProjects/ch13_ex4_TipCalculator/app/src/main/res/values-v14/styles.xml -->
     <eat-comment/>
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar"/>
 </resources>
